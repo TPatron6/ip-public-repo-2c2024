@@ -48,10 +48,10 @@
                             <h3 class="card-title">{{ img.name }}</h3>
                             <p class="card-text">
                                 <strong>
-                                            {% if true == 'Alive' %} 🟢 {{ img.status }} 
-                                            {% elif true == 'Dead' %} 🔴 {{ img.status }} 
-                                            {% else %} 🟠 {{ img.status }} 
-                                            {% endif %}
+                                            {% if img.status == 'Alive' %} 🟢 {{ img.status }}  <!--en estos condicionales fue donde realize cambios para que-->
+                                            {% elif img.status == 'Dead' %} 🔴 {{ img.status }} <!--el punto color concidiera con el estado actual del personaje que aparece en la tarjeta-->
+                                            {% else %} 🟠 {{ img.status }} <!--lo que hice fue cambiar la variable TRUE que es la que ma daba problemas ya que era incorrecto realizar una comparacion ahi-->
+                                            {% endif %} <!--y la reemplaze con el atributo img.status para que pudiera ejecutarse la comparacion de manera correcta-->
                                         </strong>
                             </p>
                             <p class="card-text"><small class="text-body-secondary">Última ubicación: {{ img.last_location }}</small></p>
