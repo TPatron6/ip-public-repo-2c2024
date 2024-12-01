@@ -1,9 +1,10 @@
 # capa de vista/presentación
 
 from django.shortcuts import redirect, render
-from .layers.services import services
+from app.layers.services.services import getAllImages #se completan los campos que faltaban y se importa la funcion correspondiente
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from app.layers.transport.transport import fetch_characters
 
 def index_page(request):
     return render(request, 'index.html')
@@ -11,22 +12,35 @@ def index_page(request):
 # esta función obtiene 2 listados que corresponden a las imágenes de la API y los favoritos del usuario, y los usa para dibujar el correspondiente template.
 # si el opcional de favoritos no está desarrollado, devuelve un listado vacío.
 def home(request):
-    images = []
-    favourite_list = []
+    # Llamamos a getAllImages para obtener todas las imágenes.
+    images = getAllImages()
+    # Tomamos el parámetro de búsqueda de la solicitud.
+    search_input = request.GET.get('search', None)
 
-    return render(request, 'home.html', { 'images': images, 'favourite_list': favourite_list })
+    if search_input:
+        # Filtramos las imágenes si se proporciona un parámetro de búsqueda.
+        images = [img for img in images if search_input.lower() in img.name.lower()]
+
+    # También puedes pasar los favoritos si es necesario.
+    favourite_list = []
+    return render(request, 'home.html', {'images': images, 'favourite_list': favourite_list, 'search_input': search_input})
 
 def search(request):
-    search_msg = request.POST.get('query', '')
+    if request.method == 'POST':
+        search_msg = request.POST.get('query', '')
+        # si el texto ingresado no es vacío, trae las imágenes y favoritos desde services.py,
+        # y luego renderiza el template (similar a home).
 
-    # si el texto ingresado no es vacío, trae las imágenes y favoritos desde services.py,
-    # y luego renderiza el template (similar a home).
-    if (search_msg != ''):
-        pass
+        if search_msg:
+            # Redirigimos a home con el parámetro de búsqueda.
+            return redirect(f'/home?search={search_msg}')
+        else:
+            # Si no hay mensaje de búsqueda, redirigimos a home.
+            return redirect('home')
     else:
+        # Si la solicitud no es POST, redirigimos a home.
         return redirect('home')
-
-
+    
 # Estas funciones se usan cuando el usuario está logueado en la aplicación.
 @login_required
 def getAllFavouritesByUser(request):
